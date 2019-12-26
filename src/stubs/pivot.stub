@@ -30,4 +30,20 @@ class {{class}} extends Migration
     {
         Schema::dropIfExists('{{pivotTableName}}');
     }
+
+    /*
+    class {{columnOne}} extends Model
+    {
+        public function {{actionPivotTableName}}() {
+            return $this->belongsToMany(Point::class, '{{pivotTableName}}');
+        }
+    }
+
+    class {{columnTwo}} extends Model
+    {
+        public function {{actionPivotTableName}}() {
+            return $this->belongsToMany(Point::class, '{{pivotTableName}}');
+        }
+    }
+    */
 }

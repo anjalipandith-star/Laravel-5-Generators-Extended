@@ -85,7 +85,9 @@ class PivotMigrationMakeCommand extends GeneratorCommand
     {
         $stub = $this->files->get($this->getStub());
 
+        echo "stub " . $stub; 
         return $this->replacePivotTableName($stub)
+            ->replaceActionPivotTableName($stub)
             ->replaceSchema($stub)
             ->replaceClass($stub, $this->getClassName());
     }
@@ -102,7 +104,12 @@ class PivotMigrationMakeCommand extends GeneratorCommand
 
         return $this;
     }
+    protected function replaceActionPivotTableName(&$stub)
+    {
+        $stub = str_replace('{{actionPivotTableName}}', $this->getAction(), $stub);
 
+        return $this;
+    }
     /**
      * Apply the correct schema to the stub.
      *
@@ -116,6 +123,7 @@ class PivotMigrationMakeCommand extends GeneratorCommand
             $this->getSortedTableNames()
         );
 
+        var_dump($tables);
         $stub = str_replace(
             ['{{columnOne}}', '{{columnTwo}}', '{{tableOne}}', '{{tableTwo}}'],
             $tables,
@@ -146,9 +154,14 @@ class PivotMigrationMakeCommand extends GeneratorCommand
      */
     protected function getPivotTableName()
     {
-        return implode('_', $this->getSortedSingularTableNames());
-    }
+        return implode('_', $this->getSortedSingularTableNames()) . '_' . $this->getPivotTableNameFromInput();
 
+    }
+    protected function getAction()
+    {
+        return $this->getPivotTableNameFromInput();
+
+    }
     /**
      * Sort the two tables in alphabetical order.
      *
@@ -173,6 +186,7 @@ class PivotMigrationMakeCommand extends GeneratorCommand
 
         sort($tables);
 
+        var_dump($tables);
         return $tables;
     }
 
@@ -189,6 +203,11 @@ class PivotMigrationMakeCommand extends GeneratorCommand
         ];
     }
 
+    protected function getPivotTableNameFromInput()
+    {
+        return strtolower($this->argument('pivotTableName'));
+    }
+
     /**
      * Get the console command arguments.
      *
@@ -198,7 +217,8 @@ class PivotMigrationMakeCommand extends GeneratorCommand
     {
         return [
             ['tableOne', InputArgument::REQUIRED, 'The name of the first table.'],
-            ['tableTwo', InputArgument::REQUIRED, 'The name of the second table.']
+            ['tableTwo', InputArgument::REQUIRED, 'The name of the second table.'],
+            ['pivotTableName', InputArgument::OPTIONAL, 'The name of the pivot table.']
         ];
     }
 }
